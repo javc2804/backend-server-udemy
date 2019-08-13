@@ -3,7 +3,8 @@ var express = require('express');
 var app = express();
 var bcrypt = require('bcryptjs');
 var Usuario = require('../models/usuario');
-
+var jwt = require('jsonwebtoken');
+var SEED = require('../config/config').SEED
 // Obtener todos los usuarios.
 
 app.get('/', ( req, res, next ) => {
@@ -24,9 +25,23 @@ app.get('/', ( req, res, next ) => {
     });
 });
 
+// Verificar token 
+
+app.use('/', ( req, res, next ) => {
+    var token = req.query.token;
+    jwt.verify( token, SEED, ( err, decoded ) => {
+        if ( err ) {
+            return res.status(401).json({
+                ok: false,
+                msj: 'Token incorrecto',
+                errors: err
+            });
+        }
+        next();
+    });
+});
+
 //Actualizar usuario
-
-
 
 app.put('/:id', (req, res) => {
     var id = req.params.id;

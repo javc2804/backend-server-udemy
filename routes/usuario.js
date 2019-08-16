@@ -7,7 +7,13 @@ var mdAutenticacion = require('../middlewares/autenticacion');
 // Obtener todos los usuarios.
 
 app.get('/', ( req, res, next ) => {
+
+    var desde = req.query.desde || 0;
+    desde = Number(desde);
+
     Usuario.find({  }, 'nombre email img role') // se selecciona de las colecciones los campos menos el de la pwd.
+    .skip(desde)
+    .limit(5)
     .exec(
         ( err, usuarios ) => {
             if( err ) {
@@ -17,10 +23,14 @@ app.get('/', ( req, res, next ) => {
                     errors: err
                 });
             } 
+
+        Usuario.count({}, (err, conteo) =>{
             res.status(200).json({
                 ok: true,
-                usuarios: usuarios
+                usuarios: usuarios,
+                total: conteo
             });
+        });
     });
 });
 

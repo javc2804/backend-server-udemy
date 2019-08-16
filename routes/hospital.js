@@ -7,6 +7,7 @@ var SEED = require('../config/config').SEED
 
 app.get('/',( req, res, next ) => {
     Hospital.find({  }, 'nombre img usuario')
+    .populate('usuario', 'nombre email')
     .exec(
         ( err, hospitales ) => {
             if( err ) {
@@ -30,7 +31,7 @@ app.post('/', mdAutenticacion.verificaToken,( req, res ) => {
     var hospital = new Hospital({
         nombre: body.nombre,
         img: body.img,
-        usuario: body.usuario,
+        usuario: req.usuario._id,
     });
 
     hospital.save( ( err, hospitalGuardado ) => {
@@ -72,8 +73,7 @@ app.put('/:id',mdAutenticacion.verificaToken,( req, res, next ) => {
         }
 
         hospital.nombre = body.nombre;
-        hospital.usuario = body.usuario;
-        hospital.img = body.img;
+        hospital.usuario = req.usuario._id;
 
         hospital.save( (err, hospitalGuardado) => {
             if ( err ) {

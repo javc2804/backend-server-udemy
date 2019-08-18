@@ -34,6 +34,38 @@ app.get('/', ( req, res, next ) => {
     });
 });
 
+// Crear nuevo usuario
+
+app.post('/' ,( req, res ) => {
+    var body = req.body;
+    var usuario = new Usuario({
+        nombre: body.nombre,
+        email: body.email,
+        password: bcrypt.hashSync(body.password, 10),
+        img: body.img,
+        rol: body.rol
+    });
+
+    
+
+    usuario.save( ( err, usuarioGuardado ) => {
+
+        if( err ) {
+            return res.status(500).json({
+                ok: false,
+                msj: 'Error al buscar usuario',
+                errors: err
+            });
+        }
+
+        res.status(201).json({
+            ok: true,
+            usuario: usuarioGuardado,
+            usuarioToken: req.usuario
+        });
+    });
+})
+
 
 //Actualizar usuario
 
@@ -82,38 +114,6 @@ app.put('/:id', mdAutenticacion.verificaToken , (req, res) => {
 
     });
 });
-
-// Crear nuevo usuario
-
-app.post('/', mdAutenticacion.verificaToken ,( req, res ) => {
-    var body = req.body;
-    var usuario = new Usuario({
-        nombre: body.nombre,
-        email: body.email,
-        password: bcrypt.hashSync(body.password, 10),
-        img: body.img,
-        rol: body.rol
-    });
-
-    
-
-    usuario.save( ( err, usuarioGuardado ) => {
-
-        if( err ) {
-            return res.status(500).json({
-                ok: false,
-                msj: 'Error al buscar usuario',
-                errors: err
-            });
-        }
-
-        res.status(201).json({
-            ok: true,
-            usuario: usuarioGuardado,
-            usuarioToken: req.usuario
-        });
-    });
-})
 
 // Borrar usuario
 
